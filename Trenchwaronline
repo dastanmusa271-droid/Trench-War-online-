@@ -1,0 +1,148 @@
+using UnityEngine;
+
+public enum Team
+{
+    Ittifak, // Osmanlı, Almanya, Avusturya-Macaristan
+    Itilaf   // İngiltere, Fransa, Rusya
+}
+
+public class TeamManager : MonoBehaviour
+{
+    public Team team;
+
+    void Start()
+    {
+        if (team == Team.Ittifak)
+        {
+            Debug.Log("Bu asker İttifak tarafında!");
+        }
+        else
+        {
+            Debug.Log("Bu asker İtilaf tarafında!");
+        }
+    }
+}using UnityEngine;
+
+public class WeaponSystem : MonoBehaviour
+{
+    public GameObject bulletPrefab;
+    public Transform firePoint;
+    public float fireRate = 0.5f;
+    float nextFireTime = 0f;
+
+    void Update()
+    {
+        if (Input.GetButton("Fire1") && Time.time >= nextFireTime)
+        {
+            Fire();
+            nextFireTime = Time.time + fireRate;
+        }
+    }
+
+    void Fire()
+    {
+        Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+    }
+}Time.timeusing UnityEngine;
+using UnityEngine.SceneManagement;
+
+public class GameManager : MonoBehaviour
+{
+    public static GameManager instance;
+
+    public int score = 0;
+    public int playerHealth = 100;
+
+    void Awake()
+    {
+        if (instance == null)
+            instance = this;
+        else
+            Destroy(gameObject);
+    }
+
+    public void AddScore(int amount)
+    {
+        score += amount;
+        Debug.Log("Score: " + score);
+    }
+
+    public void PlayerHit(int damage)
+    {
+        playerHealth -= damage;
+        if (playerHealth <= 0)
+        {
+            EndGame();
+        }
+    }
+
+    void EndGame()
+    {
+        Debug.Log("Game Over!");
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+}using UnityEngine;
+
+public class EnemyAI : MonoBehaviour
+{
+    public float moveSpeed = 2f;
+    public int health = 50;
+    public int damage = 10;
+    public Transform player;
+
+    void Update()
+    {
+        if (player != null)
+        {
+            Vector3 direction = (player.position - transform.position).normalized;
+            transform.Translate(direction * moveSpeed * Time.deltaTime, Space.World);
+        }
+    }
+
+    public void TakeDamage(int amount)
+    {
+        health -= amount;
+        if (health <= 0)
+        {
+            GameManager.instance.AddScore(10);
+            Destroy(gameObject);
+        }
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            GameManager.instance.PlayerHit(damage);
+            Destroy(gameObject);
+        }
+    }
+}using UnityEngine;
+
+public class PlayerController : MonoBehaviour
+{
+    public float moveSpeed = 5f;
+    public float rotateSpeed = 200f;
+    public GameObject bulletPrefab;
+    public Transform firePoint;
+
+    void Update()
+    {
+        // Hareket
+        float move = Input.GetAxis("Vertical") * moveSpeed * Time.deltaTime;
+        float rotate = Input.GetAxis("Horizontal") * rotateSpeed * Time.deltaTime;
+        transform.Translate(0, 0, move);
+        transform.Rotate(0, rotate, 0);
+
+        // Ateş
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Shoot();
+        }
+    }
+
+    void Shoot()
+    {
+        Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+    }
+}
