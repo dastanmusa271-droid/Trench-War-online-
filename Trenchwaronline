@@ -3,7 +3,7 @@ using UnityEngine;
 public enum Team
 {
     Ittifak, // Osmanlı, Almanya, Avusturya-Macaristan
-    Itilaf   // İngiltere, Fransa, Rusya
+    Itilaf   // İngiltere, Fransa, Rusya, İtalya 
 }
 
 public class TeamManager : MonoBehaviour
